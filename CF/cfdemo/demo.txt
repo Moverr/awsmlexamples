@@ -1,0 +1,42 @@
+
+*** TEMPLATE 0 : CREATE DIRECTLY
+
+aws cloudformation validate-template --template-body file://template0.json
+aws cloudformation create-stack --template-body file://template0.json --stack-name Template0
+
+aws cloudformation describe-stacks --stack-name Template0
+aws cloudformation describe-stacks --stack-name Template0 --query "Stacks[].StackStatus"
+aws cloudformation describe-stack-events --stack-name Template0
+aws cloudformation get-template --stack-name Template0
+
+aws cloudformation delete-stack --stack-name Template0
+
+*** TEMPLATE 0: CREATE WITH CHANGE SET
+
+aws cloudformation create-change-set --stack-name Template0 --template-body file://template0.json \
+	--change-set-type CREATE --change-set-name createTemplate0
+aws cloudformation describe-change-set --stack-name Template0 --change-set-name createTemplate0
+aws cloudformation execute-change-set --stack-name Template0 --change-set-name createTemplate0
+aws cloudformation delete-stack --stack-name Template0
+
+*** TEMPLATE 1: CREATE V1, THEN UPDATE TO V2 DIRECTLY
+
+aws cloudformation create-stack --template-body file://template1.json --stack-name Template1
+aws cloudformation update-stack --stack-name Template1 --template-body file://template1v2.json
+aws cloudformation delete-stack --stack-name Template1
+
+*** TEMPLATE 1: CREATE V1, UPDATE TO V2 AND V3 WITH CHANGE SETS
+
+aws cloudformation create-stack --template-body file://template1.json --stack-name Template1
+
+aws cloudformation create-change-set --stack-name Template1 --template-body file://template1v2.json \
+	--change-set-type UPDATE --change-set-name updateTemplate1v2 --parameters ParameterKey=SecurityGroupParameter,ParameterValue=PingSG
+aws cloudformation describe-change-set --stack-name Template1 --change-set-name updateTemplate1v2
+aws cloudformation execute-change-set --stack-name Template1 --change-set-name updateTemplate1v2
+
+aws cloudformation create-change-set --stack-name Template1 --template-body file://template1v3.json \
+	--change-set-type UPDATE --change-set-name updateTemplate1v3
+aws cloudformation describe-change-set --stack-name Template1 --change-set-name updateTemplate1v3
+aws cloudformation execute-change-set --stack-name Template1 --change-set-name updateTemplate1v3
+
+aws cloudformation delete-stack --stack-name Template1
